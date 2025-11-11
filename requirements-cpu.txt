@@ -1,0 +1,8 @@
+# PyTorch - Versão apenas CPU (mais leve, sem suporte GPU)
+# Instalar com: pip install -r requirements-cpu.txt
+torch>=2.0.0
+torchvision>=0.15.0
+pillow>=9.0.0
+numpy>=1.21.0
+jupyter>=1.0.0
+
