@@ -29,11 +29,31 @@ try:
         print(f"  - Número de GPUs: {torch.cuda.device_count()}")
         print(f"  - Nome da GPU: {torch.cuda.get_device_name(0)}")
         print(f"  - Versão CUDA: {torch.version.cuda}")
+        
+        # Informações de memória GPU
+        props = torch.cuda.get_device_properties(0)
+        memoria_total_gb = props.total_memory / (1024**3)
+        print(f"  - Memória GPU total: {memoria_total_gb:.2f} GB")
+        
+        # Teste rápido de operação na GPU
+        try:
+            x = torch.randn(1000, 1000).cuda()
+            y = torch.randn(1000, 1000).cuda()
+            z = torch.matmul(x, y)
+            del x, y, z
+            torch.cuda.empty_cache()
+            print("  - ✓ Teste de operação GPU: SUCESSO")
+        except Exception as e:
+            print(f"  - ✗ Teste de operação GPU: FALHOU ({e})")
     else:
         print("  - O PyTorch usará CPU para processamento")
         if build_tipo == "CUDA":
             print("  - ⚠️  Você tem um build com CUDA, mas CUDA não está configurado no sistema")
             print("  - O PyTorch funcionará normalmente, mas apenas com CPU")
+            print("\n  Para usar GPU, você precisa:")
+            print("    1. Instalar CUDA Toolkit: https://developer.nvidia.com/cuda-downloads")
+            print("    2. Instalar drivers NVIDIA atualizados")
+            print("    3. Verificar compatibilidade da GPU: https://developer.nvidia.com/cuda-gpus")
     
     print("\n" + "=" * 60)
     print("RESUMO:")

@@ -7,31 +7,43 @@ Este projeto implementa uma rede neural convolucional (CNN) para classificar ima
 - Python 3.7 ou superior
 - CUDA (opcional, para usar GPU)
 
+## 🚀 Instalação Rápida
+
+📖 **Para um guia completo de instalação passo a passo, veja:** [`GUIA_INSTALACAO.md`](GUIA_INSTALACAO.md)
+
+### Instalação Básica
+
+1. **Criar e ativar ambiente virtual (recomendado):**
+
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+```
+
+2. **Instalar dependências:**
+
+```bash
+# Com suporte GPU (recomendado se tiver GPU NVIDIA)
+pip install -r requirements.txt
+
+# Apenas CPU (mais leve)
+pip install -r requirements-cpu.txt
+```
+
+3. **Verificar instalação:**
+
+```bash
+python verificar_instalacao.py
+```
+
 ## 🚀 Como Executar
 
 ### Opção 1: Executar como Script Python (Recomendado)
-
-#### 1. Instalar as Dependências
-
-```bash
-pip install -r requirements.txt
-```
-
-Ou, se preferir usar um ambiente virtual (recomendado):
-
-```bash
-# Criar ambiente virtual
-python3 -m venv venv
-
-# Ativar ambiente virtual (Linux/Mac)
-source venv/bin/activate
-
-# Ativar ambiente virtual (Windows)
-venv\Scripts\activate
-
-# Instalar dependências
-pip install -r requirements.txt
-```
 
 #### 2. Verificar os Arquivos de Dados
 
@@ -107,6 +119,22 @@ projeto_ia/
 ## 🔧 Configurações
 
 O projeto detecta automaticamente se há GPU disponível. Se você tiver CUDA instalado, o treinamento será executado na GPU, caso contrário, usará a CPU.
+
+### 🚀 Usando GPU
+
+Para usar GPU, você precisa:
+
+1. **Instalar CUDA Toolkit**: https://developer.nvidia.com/cuda-downloads
+2. **Instalar PyTorch com suporte CUDA**:
+   ```bash
+   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+   ```
+3. **Verificar instalação**:
+   ```bash
+   python verificar_instalacao.py
+   ```
+
+📖 **Guia completo de GPU**: Veja o arquivo `GUIA_GPU.md` para instruções detalhadas.
 
 Para ajustar os parâmetros de treinamento, edite o arquivo `main.py`:
 

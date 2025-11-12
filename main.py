@@ -56,14 +56,15 @@ def main():
         dataset,
         epochs=epochs,
         learning_rate=learning_rate,
-        batch_size=batch_size
+        batch_size=batch_size,
+        device=device
     )
     
     # Avaliar modelo
     print("\n" + "="*50)
     print("AVALIANDO MODELO")
     print("="*50)
-    resultados = avaliar_modelo(cnn, dataset)
+    resultados = avaliar_modelo(cnn, dataset, device=device)
     imprimir_resultados(resultados)
     
     # Salvar modelo (opcional)

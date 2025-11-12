@@ -51,7 +51,7 @@ def carregar_imagens(zip_path, label, max_imagens, transform, tensores_entrada, 
                     return
 
 
-def preparar_dataset(zip_path_passaros, zip_path_nao_passaros, max_imagens_por_classe, device):
+def preparar_dataset(zip_path_passaros, zip_path_nao_passaros, max_imagens_por_classe, device=None):
     """
     Prepara o dataset completo a partir dos arquivos ZIP.
     
@@ -59,10 +59,11 @@ def preparar_dataset(zip_path_passaros, zip_path_nao_passaros, max_imagens_por_c
         zip_path_passaros: Caminho para o ZIP com imagens de pássaros
         zip_path_nao_passaros: Caminho para o ZIP com imagens de não-pássaros
         max_imagens_por_classe: Número máximo de imagens por classe
-        device: Dispositivo onde os tensores serão armazenados ('cuda' ou 'cpu')
+        device: Dispositivo (obsoleto, mantido para compatibilidade). 
+                Os dados são mantidos na CPU e movidos para GPU durante o treinamento.
         
     Returns:
-        TensorDataset: Dataset pronto para treinamento
+        TensorDataset: Dataset pronto para treinamento (dados na CPU)
     """
     transform = criar_transformacoes()
     tensores_entrada = []
@@ -86,14 +87,13 @@ def preparar_dataset(zip_path_passaros, zip_path_nao_passaros, max_imagens_por_c
     x_embaralhado = tensor_x[indices_embaralhados]
     y_embaralhado = tensor_y[indices_embaralhados]
     
-    # Mover para o dispositivo apropriado
-    x_dispositivo = x_embaralhado.to(device)
-    y_dispositivo = y_embaralhado.to(device)
+    # Manter dados na CPU (serão movidos para GPU em batches durante o treinamento)
+    # Isso é mais eficiente em termos de memória GPU
+    dataset = TensorDataset(x_embaralhado, y_embaralhado)
     
-    dataset = TensorDataset(x_dispositivo, y_dispositivo)
-    
-    print(f'Shape do batch: {x_dispositivo.shape}')
-    print(f'Shape dos rótulos: {y_dispositivo.shape}')
+    print(f'Shape do batch: {x_embaralhado.shape}')
+    print(f'Shape dos rótulos: {y_embaralhado.shape}')
+    print(f'Dataset criado na CPU (dados serão movidos para GPU durante treinamento)')
     
     return dataset
 

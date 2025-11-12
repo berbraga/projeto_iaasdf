@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 
 
-def avaliar_modelo(cnn, dataset, threshold=0.5):
+def avaliar_modelo(cnn, dataset, threshold=0.5, device=None):
     """
     Avalia o modelo e gera uma matriz de confusão.
     
@@ -13,10 +13,16 @@ def avaliar_modelo(cnn, dataset, threshold=0.5):
         cnn: Modelo treinado
         dataset: Dataset para avaliação
         threshold: Limiar para classificação (padrão: 0.5)
+        device: Dispositivo ('cpu' ou 'cuda'). Se None, detecta automaticamente.
         
     Returns:
         dict: Dicionário com a matriz de confusão e métricas
     """
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    
+    cnn = cnn.to(device)
+    cnn.eval()
     train_loader = DataLoader(dataset, batch_size=1, shuffle=True)
     
     # Matriz de confusão: [predito][real]
@@ -24,14 +30,19 @@ def avaliar_modelo(cnn, dataset, threshold=0.5):
     # [1][0] = falso positivo, [1][1] = verdadeiro positivo
     matriz_confusao = [[0, 0], [0, 0]]
     
-    for inputs, targets in train_loader:
-        x_hat = cnn(inputs)
-        classe_predita = 0
-        if x_hat[0] > threshold:
-            classe_predita = 1
-        
-        classe_real = int(targets[0][0])
-        matriz_confusao[classe_predita][classe_real] += 1
+    with torch.no_grad():
+        for inputs, targets in train_loader:
+            # Mover dados para o dispositivo apropriado
+            inputs = inputs.to(device)
+            targets = targets.to(device)
+            
+            x_hat = cnn(inputs)
+            classe_predita = 0
+            if x_hat[0] > threshold:
+                classe_predita = 1
+            
+            classe_real = int(targets[0][0])
+            matriz_confusao[classe_predita][classe_real] += 1
     
     verdadeiros_positivos = matriz_confusao[1][1]
     verdadeiros_negativos = matriz_confusao[0][0]

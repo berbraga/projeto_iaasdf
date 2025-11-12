@@ -112,5 +112,8 @@ def treinar_rede(modelo, dataset_treino, dataset_validacao, epochs=50,
     modelo.load_state_dict(torch.load('melhor_modelo_culturas.pth'))
     print(f"Melhor acurácia de validação: {melhor_acc_validacao:.2f}%")
     
+    # Adicionar melhor acurácia ao histórico
+    historico['melhor_acc_validacao'] = melhor_acc_validacao
+    
     return modelo, historico
 
