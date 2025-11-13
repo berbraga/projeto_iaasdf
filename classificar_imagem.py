@@ -59,21 +59,33 @@ def carregar_classes(caminho_classes='classes_culturas.txt'):
     return classes
 
 
-def preprocessar_imagem(caminho_imagem, tamanho=224):
+def preprocessar_imagem(caminho_imagem, tamanho=224, normalizar=True):
     """
     Carrega e preprocessa uma imagem para classificação.
     
     Args:
         caminho_imagem: Caminho para a imagem
         tamanho: Tamanho para redimensionar (padrão: 224)
+        normalizar: Se True, aplica normalização estatística (deve ser igual ao treinamento)
         
     Returns:
         Tensor da imagem processada
     """
-    transform = transforms.Compose([
+    transformacoes = [
         transforms.Resize((tamanho, tamanho)),
-        transforms.ToTensor()
-    ])
+        transforms.ToTensor()  # Converte para [0, 1]
+    ]
+    
+    # Normalização estatística (mesma usada no treinamento)
+    if normalizar:
+        transformacoes.append(
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],  # Média para cada canal RGB
+                std=[0.229, 0.224, 0.225]     # Desvio padrão para cada canal RGB
+            )
+        )
+    
+    transform = transforms.Compose(transformacoes)
     
     try:
         imagem = Image.open(caminho_imagem).convert('RGB')

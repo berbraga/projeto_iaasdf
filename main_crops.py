@@ -23,7 +23,7 @@ def main():
     tamanho_imagem = 224
     imagens_treino = 20
     imagens_validacao = 12
-    epochs = 500
+    epochs = 2000
     learning_rate = 0.00001
     batch_size = 64
     num_classes = 30
@@ -93,11 +93,6 @@ def main():
         batch_size=batch_size
     )
     imprimir_resultados(resultados, classes)
-    
-    # Salvar histórico em JSON
-    with open('historico_treinamento.json', 'w', encoding='utf-8') as f:
-        json.dump(historico, f, indent=2)
-    print(f"\nHistórico salvo em 'historico_treinamento.json'")
     
     # Gerar gráficos das curvas de treinamento
     print("\n" + "="*70)

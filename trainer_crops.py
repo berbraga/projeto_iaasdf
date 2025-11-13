@@ -1,6 +1,7 @@
 """
 Módulo contendo a função de treinamento da rede neural para classificação de culturas.
 """
+import os
 import time
 import torch
 import torch.nn as nn
@@ -39,6 +40,7 @@ def treinar_rede(modelo, dataset_treino, dataset_validacao, epochs=50,
     }
     
     melhor_acc_validacao = 0.0
+    caminho_melhor_modelo = 'melhor_modelo_culturas.pth'
     
     for epoch in range(epochs):
         # Fase de treinamento
@@ -100,7 +102,27 @@ def treinar_rede(modelo, dataset_treino, dataset_validacao, epochs=50,
         # Salvar melhor modelo
         if acc_validacao > melhor_acc_validacao:
             melhor_acc_validacao = acc_validacao
-            torch.save(modelo.state_dict(), 'melhor_modelo_culturas.pth')
+            try:
+                # Tentar salvar usando nome temporário primeiro
+                caminho_temp = caminho_melhor_modelo + '.tmp'
+                torch.save(modelo.state_dict(), caminho_temp)
+                
+                # Se sucesso, substituir arquivo antigo
+                if os.path.exists(caminho_melhor_modelo):
+                    os.remove(caminho_melhor_modelo)
+                os.rename(caminho_temp, caminho_melhor_modelo)
+                
+            except Exception as e:
+                print(f"⚠️  Aviso: Não foi possível salvar o melhor modelo: {e}")
+                print(f"   Tentando salvar com nome alternativo...")
+                try:
+                    # Tentar com nome alternativo
+                    caminho_alternativo = f'melhor_modelo_culturas_ep{epoch+1}.pth'
+                    torch.save(modelo.state_dict(), caminho_alternativo)
+                    caminho_melhor_modelo = caminho_alternativo
+                    print(f"   ✓ Modelo salvo em '{caminho_alternativo}'")
+                except Exception as e2:
+                    print(f"   ❌ Erro ao salvar modelo alternativo: {e2}")
         
         print(f"Época {epoch+1}/{epochs}:")
         print(f"  Treino - Loss: {perda_media_treino:.4f}, Acc: {acc_treino:.2f}%")
@@ -109,7 +131,16 @@ def treinar_rede(modelo, dataset_treino, dataset_validacao, epochs=50,
         print()
     
     # Carregar melhor modelo
-    modelo.load_state_dict(torch.load('melhor_modelo_culturas.pth'))
+    if os.path.exists(caminho_melhor_modelo):
+        try:
+            modelo.load_state_dict(torch.load(caminho_melhor_modelo, map_location=device))
+            print(f"✓ Melhor modelo carregado de '{caminho_melhor_modelo}'")
+        except Exception as e:
+            print(f"⚠️  Aviso: Não foi possível carregar o melhor modelo: {e}")
+            print("   Usando modelo da última época...")
+    else:
+        print("⚠️  Aviso: Arquivo do melhor modelo não encontrado. Usando modelo da última época...")
+    
     print(f"Melhor acurácia de validação: {melhor_acc_validacao:.2f}%")
     
     # Adicionar melhor acurácia ao histórico

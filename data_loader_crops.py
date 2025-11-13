@@ -39,20 +39,33 @@ class CropDataset(Dataset):
         return image, label
 
 
-def criar_transformacoes(tamanho_imagem=224):
+def criar_transformacoes(tamanho_imagem=224, normalizar=True):
     """
     Cria as transformações para padronizar e converter imagens para tensores.
     
     Args:
         tamanho_imagem: Tamanho para redimensionar as imagens (padrão: 224x224)
+        normalizar: Se True, aplica normalização estatística (padrão: True)
         
     Returns:
         Compose: Objeto com as transformações aplicadas
     """
-    return transforms.Compose([
+    transformacoes = [
         transforms.Resize((tamanho_imagem, tamanho_imagem)),
-        transforms.ToTensor()
-    ])
+        transforms.ToTensor()  # Converte para [0, 1]
+    ]
+    
+    # Normalização estatística: normaliza para média ~0 e desvio padrão ~1
+    # Valores padrão do ImageNet (comum em modelos de visão computacional)
+    if normalizar:
+        transformacoes.append(
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],  # Média para cada canal RGB
+                std=[0.229, 0.224, 0.225]     # Desvio padrão para cada canal RGB
+            )
+        )
+    
+    return transforms.Compose(transformacoes)
 
 
 def carregar_imagens_classe(caminho_classe, transform, max_imagens=None):
